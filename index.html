@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moodboard Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Il Tuo Moodboard Generator</h1>
+        <p>Carica le tue immagini di ispirazione per creare una moodboard istantanea.</p>
+        <!-- L'input "file" è nascosto, lo attiveremo con il nostro pulsante personalizzato -->
+        <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+        <button id="upload-button">Carica Immagini</button>
+    </header>
+
+    <main>
+        <!-- Qui verranno aggiunte le immagini -->
+        <div class="grid" id="moodboard-grid">
+            <!-- Esempio di come apparirà un'immagine:
+            <div class="grid-item">
+                <img src="...">
+            </div>
+            -->
+        </div>
+    </main>
+
+    <!-- Includiamo la libreria Masonry (da un CDN gratuito) -->
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <!-- Includiamo il nostro script JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
