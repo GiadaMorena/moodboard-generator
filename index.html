@@ -12,23 +12,23 @@
         <h1>Moodboard Generator</h1>
         <p>Trascina le tue immagini qui sotto, oppure usa i pulsanti per iniziare.</p>
         
-        <!-- Input per i file (nascosto) -->
         <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
         
-        <!-- Pulsanti di azione -->
         <button id="upload-button">Carica Immagini</button>
         <button id="add-note-button">Aggiungi Nota</button>
     </header>
 
     <main>
-        <!-- La griglia dove appariranno tutti gli elementi -->
         <div class="grid" id="moodboard-grid"></div>
     </main>
 
-    <!-- Librerie Esterne (devono essere prima del nostro script.js) -->
-    <!-- 1. Masonry.js per il layout a mosaico -->
+    <!-- NUOVA SEZIONE: Lightbox per lo Zoom delle Immagini -->
+    <div id="lightbox-overlay" class="hidden">
+        <img id="lightbox-img" src="" alt="Immagine ingrandita">
+    </div>
+
+    <!-- Librerie Esterne -->
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-    <!-- 2. ColorThief.js per estrarre i colori dalle immagini -->
     <script src="https://unpkg.com/colorthief@2.3.2/dist/color-thief.umd.js"></script>
     
     <!-- Il nostro script personalizzato -->
