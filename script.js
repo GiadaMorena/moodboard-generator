@@ -12,8 +12,8 @@ const msnry = new Masonry(moodboardGrid, {
     itemSelector: '.grid-item',
     columnWidth: '.grid-item',
     percentPosition: true,
-    gutter: 15,
-    transitionDuration: '0.4s'
+    gutter: 20, // Aumentato leggermente per il nuovo design
+    transitionDuration: '0.5s'
 });
 
 // --- FUNZIONI HELPER ---
@@ -38,21 +38,26 @@ function addDeleteButton(gridItem) {
 }
 
 /**
- * Crea un elemento immagine con palette espandibile
+ * Crea un elemento immagine con palette espandibile (FIXED)
  * @param {string} src - La sorgente dell'immagine
  */
 function createImageItem(src) {
     const gridItem = document.createElement('div');
-    gridItem.classList.add('grid-item');
+    gridItem.classList.add('grid-item', 'image-item'); // Aggiungo 'image-item' per distinguerlo
     addDeleteButton(gridItem);
+
+    // **FIX PER LO ZOOM:** L'evento click è ora sul gridItem, non sull'immagine
+    gridItem.addEventListener('click', () => {
+        lightboxImg.src = src;
+        lightboxOverlay.classList.remove('hidden');
+    });
 
     const img = document.createElement('img');
     img.src = src;
     img.crossOrigin = "Anonymous";
-    img.addEventListener('click', () => {
-        lightboxImg.src = src;
-        lightboxOverlay.classList.remove('hidden');
-    });
+    
+    // Inseriamo l'immagine prima
+    gridItem.appendChild(img);
 
     img.onload = () => {
         const colorThief = new ColorThief();
@@ -60,11 +65,10 @@ function createImageItem(src) {
             const paletteRgb = colorThief.getPalette(img, 5);
             const paletteHex = paletteRgb.map(rgbToHex);
             
-            // 1. Crea il contenitore principale per la palette
             const paletteContainer = document.createElement('div');
             paletteContainer.classList.add('palette-container');
 
-            // 2. Crea la VISTA COMPATTA (visibile di default)
+            // Vista compatta
             const compactView = document.createElement('div');
             compactView.classList.add('palette-swatches-compact');
             paletteHex.forEach(hex => {
@@ -74,7 +78,7 @@ function createImageItem(src) {
                 compactView.appendChild(swatch);
             });
 
-            // 3. Crea la VISTA DETTAGLIATA (nascosta di default)
+            // Vista dettagliata
             const detailedView = document.createElement('div');
             detailedView.classList.add('palette-details');
             paletteHex.forEach(hex => {
@@ -90,7 +94,7 @@ function createImageItem(src) {
                 copyFeedback.classList.add('copy-feedback');
                 colorInfo.append(swatch, hexCode, copyFeedback);
                 colorInfo.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Evita che il click si propaghi e chiuda la palette
+                    e.stopPropagation();
                     navigator.clipboard.writeText(hex).then(() => {
                         copyFeedback.textContent = 'Copiato!';
                         setTimeout(() => { copyFeedback.textContent = ''; }, 2000);
@@ -101,44 +105,44 @@ function createImageItem(src) {
 
             const downloadBtn = document.createElement('button');
             downloadBtn.classList.add('download-palette-btn');
-            downloadBtn.textContent = 'Scarica Palette (.svg)';
+            downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg><span>Scarica Palette</span>`;
             downloadBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 downloadPaletteAsSvg(paletteHex);
             });
             detailedView.appendChild(downloadBtn);
             
-            // 4. Aggiungi entrambe le viste al contenitore principale
             paletteContainer.appendChild(compactView);
             paletteContainer.appendChild(detailedView);
 
-            // 5. Aggiungi l'evento per ESPANDERE/CHIUDERE
-            paletteContainer.addEventListener('click', () => {
+            // L'evento per espandere ora è specifico sul contenitore
+            paletteContainer.addEventListener('click', (e) => {
+                // Se clicchiamo sulla palette, non vogliamo che si attivi lo zoom!
+                e.stopPropagation();
                 paletteContainer.classList.toggle('is-expanded');
-                // FONDAMENTALE: ricalcola il layout di Masonry dopo ogni cambio di altezza
                 msnry.layout();
             });
-
-            // 6. Aggiungi l'intera palette al grid-item
+            
+            // Aggiungo la palette al grid-item
             gridItem.appendChild(paletteContainer);
 
         } catch (e) {
             console.error("Impossibile generare la palette:", e);
         }
         
+        // Ricalcolo finale dopo aver aggiunto la palette
         msnry.layout();
     };
-
-    gridItem.appendChild(img);
+    
     moodboardGrid.prepend(gridItem);
     msnry.prepended(gridItem);
 }
+
 
 function createNoteItem() {
     const noteItem = document.createElement('div');
     noteItem.classList.add('grid-item', 'note-item');
     addDeleteButton(noteItem);
-
     const textarea = document.createElement('textarea');
     textarea.placeholder = "Scrivi qui la tua nota...";
     textarea.addEventListener('input', () => {
@@ -146,7 +150,6 @@ function createNoteItem() {
         textarea.style.height = (textarea.scrollHeight) + 'px';
         msnry.layout();
     });
-
     noteItem.appendChild(textarea);
     moodboardGrid.prepend(noteItem);
     msnry.prepended(noteItem);
@@ -154,22 +157,16 @@ function createNoteItem() {
 }
 
 function downloadPaletteAsSvg(hexColors) {
-    const swatchWidth = 100;
-    const swatchHeight = 100;
-    const svgWidth = swatchWidth * hexColors.length;
-    let svgRects = '';
-    hexColors.forEach((color, index) => {
-        svgRects += `<rect x="${index * swatchWidth}" y="0" width="${swatchWidth}" height="${swatchHeight}" fill="${color}" />`;
-    });
-    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${swatchHeight}">${svgRects}</svg>`;
+    const swatchSize = 100;
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${swatchSize * hexColors.length}" height="${swatchSize}">${hexColors.map((color, i) => `<rect x="${i * swatchSize}" y="0" width="${swatchSize}" height="${swatchSize}" fill="${color}" />`).join('')}</svg>`;
     const blob = new Blob([svgContent], {type: 'image/svg+xml'});
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'palette.svg';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'palette.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
 
