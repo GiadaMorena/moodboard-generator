@@ -12,7 +12,7 @@ const msnry = new Masonry(moodboardGrid, {
     itemSelector: '.grid-item',
     columnWidth: '.grid-item',
     percentPosition: true,
-    gutter: 20, // Aumentato leggermente per il nuovo design
+    gutter: 20,
     transitionDuration: '0.5s'
 });
 
@@ -37,16 +37,11 @@ function addDeleteButton(gridItem) {
     gridItem.appendChild(deleteBtn);
 }
 
-/**
- * Crea un elemento immagine con palette espandibile (FIXED)
- * @param {string} src - La sorgente dell'immagine
- */
 function createImageItem(src) {
     const gridItem = document.createElement('div');
-    gridItem.classList.add('grid-item', 'image-item'); // Aggiungo 'image-item' per distinguerlo
+    gridItem.classList.add('grid-item', 'image-item');
     addDeleteButton(gridItem);
 
-    // **FIX PER LO ZOOM:** L'evento click è ora sul gridItem, non sull'immagine
     gridItem.addEventListener('click', () => {
         lightboxImg.src = src;
         lightboxOverlay.classList.remove('hidden');
@@ -55,8 +50,6 @@ function createImageItem(src) {
     const img = document.createElement('img');
     img.src = src;
     img.crossOrigin = "Anonymous";
-    
-    // Inseriamo l'immagine prima
     gridItem.appendChild(img);
 
     img.onload = () => {
@@ -68,7 +61,6 @@ function createImageItem(src) {
             const paletteContainer = document.createElement('div');
             paletteContainer.classList.add('palette-container');
 
-            // Vista compatta
             const compactView = document.createElement('div');
             compactView.classList.add('palette-swatches-compact');
             paletteHex.forEach(hex => {
@@ -78,7 +70,6 @@ function createImageItem(src) {
                 compactView.appendChild(swatch);
             });
 
-            // Vista dettagliata
             const detailedView = document.createElement('div');
             detailedView.classList.add('palette-details');
             paletteHex.forEach(hex => {
@@ -115,22 +106,28 @@ function createImageItem(src) {
             paletteContainer.appendChild(compactView);
             paletteContainer.appendChild(detailedView);
 
-            // L'evento per espandere ora è specifico sul contenitore
+            // ----- LA CORREZIONE È QUI -----
+            // Aggiungiamo l'evento click che gestisce l'animazione e il layout
             paletteContainer.addEventListener('click', (e) => {
-                // Se clicchiamo sulla palette, non vogliamo che si attivi lo zoom!
+                // 1. Impediamo che il click attivi anche lo zoom dell'immagine
                 e.stopPropagation();
+
+                // 2. Aggiungiamo un listener speciale che si attiva UNA SOLA VOLTA,
+                //    esattamente quando la transizione CSS finisce.
+                detailedView.addEventListener('transitionend', () => {
+                    msnry.layout(); // 3. Ricalcoliamo il layout SOLO ORA che l'animazione è completa.
+                }, { once: true }); // `{once: true}` è fondamentale, rimuove il listener dopo l'uso.
+
+                // 4. Attiviamo la transizione CSS aggiungendo/togliendo la classe.
                 paletteContainer.classList.toggle('is-expanded');
-                msnry.layout();
             });
             
-            // Aggiungo la palette al grid-item
             gridItem.appendChild(paletteContainer);
 
         } catch (e) {
             console.error("Impossibile generare la palette:", e);
         }
         
-        // Ricalcolo finale dopo aver aggiunto la palette
         msnry.layout();
     };
     
