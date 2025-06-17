@@ -1,111 +1,159 @@
-/* Stile generale */
+/* ----- NUOVO: Variabili Colore e Importazione Font ----- */
+:root {
+    --bg-color: #f4f4f5;
+    --card-color: #ffffff;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --accent-color: #6366f1; /* Indaco */
+    --accent-hover: #4f46e5;
+    --note-bg: #fef9c3; /* Giallo più morbido */
+    --delete-bg: #ef4444;
+    --green-color: #22c55e;
+    --green-hover: #16a34a;
+    --border-color: #e5e7eb;
+}
+
+/* Stile generale e Tipografia */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #1c1e21;
+    font-family: 'Poppins', sans-serif; /* Nuovo font per la UI */
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
     padding: 20px;
+    transition: background-color 0.3s;
 }
 
 header { text-align: center; margin-bottom: 40px; }
-h1 { font-size: 2.5rem; margin-bottom: 10px; }
+h1 { font-size: 2.8rem; font-weight: 600; margin-bottom: 8px; }
+p { color: var(--text-light); font-size: 1.1rem; margin-top: 0; }
 
-#drop-zone { border: 3px dashed #ccc; padding: 30px; border-radius: 15px; transition: background-color 0.3s, border-color 0.3s; }
-#drop-zone.drag-over { background-color: #e0eaff; border-color: #007bff; }
+#drop-zone {
+    border: 2px dashed var(--border-color);
+    padding: 40px;
+    border-radius: 12px;
+    background-color: var(--card-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+#drop-zone.drag-over { background-color: #eef2ff; border-color: var(--accent-color); }
 
-button { border: none; padding: 15px 30px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.1s; margin: 5px; }
-button:active { transform: scale(0.98); }
-#upload-button { background-color: #007bff; color: white; }
-#upload-button:hover { background-color: #0056b3; }
-#add-note-button { background-color: #ffc107; color: #333; }
-#add-note-button:hover { background-color: #e0a800; }
+/* ----- NUOVO: Stile Pulsanti con Icone ----- */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
 
+button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+button:active { transform: scale(0.97); }
+
+#upload-button { background-color: var(--accent-color); color: white; }
+#upload-button:hover { background-color: var(--accent-hover); box-shadow: 0 4px 15px -5px var(--accent-color); }
+
+#add-note-button { background-color: #e5e7eb; color: var(--text-color); }
+#add-note-button:hover { background-color: #d1d5db; box-shadow: 0 4px 15px -5px #9ca3af; }
+
+
+/* Griglia e Animazione Item */
 .grid { margin: 0 auto; max-width: 1600px; }
+
+/* NUOVO: Animazione di entrata */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
 .grid-item {
     width: 23%;
-    margin-bottom: 15px;
-    border-radius: 8px;
+    margin-bottom: 20px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    background-color: #fff;
+    background-color: var(--card-color);
     position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    animation: fadeInUp 0.5s ease-out; /* Applica l'animazione */
+}
+.grid-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 }
 
-.grid-item img {
-    display: block;
-    width: 100%;
-    height: auto;
-    cursor: zoom-in;
-}
+.grid-item img { display: block; width: 100%; height: auto; cursor: zoom-in; }
 
-/* ----- NUOVI STILI PER PALETTE ESPANDIBILE ----- */
+/* Palette Colori Ridisegnata */
+.palette-swatches-compact { height: 25px; cursor: pointer; transition: filter 0.2s; }
+.palette-swatches-compact:hover { filter: brightness(1.1); }
+.palette-swatches-compact .swatch { flex-grow: 1; }
 
-/* Contenitore principale della palette */
-.palette-container {
-    /* Non ha stile di per sé, serve solo a contenere le due viste */
-}
+.palette-details { display: none; padding: 12px; background-color: #f8f9fa; border-top: 1px solid var(--border-color); }
+.palette-container.is-expanded .palette-details { display: block; }
+.palette-container.is-expanded .palette-swatches-compact { display: none; }
 
-/* 1. VISTA COMPATTA (di default) */
-.palette-swatches-compact {
-    display: flex;
-    height: 25px;
-    cursor: pointer;
-    transition: filter 0.2s;
-}
-
-.palette-swatches-compact:hover {
-    filter: brightness(1.1);
-}
-
-.palette-swatches-compact .swatch {
-    flex-grow: 1;
-}
-
-/* 2. VISTA DETTAGLIATA (nascosta di default) */
-.palette-details {
-    display: none; /* NASCOSTA DI DEFAULT */
-    padding: 10px;
-    background-color: #f8f9fa;
-}
-
-/* Regola per MOSTRARE la vista dettagliata */
-.palette-container.is-expanded .palette-details {
-    display: block;
-}
-
-/* Regola per NASCONDERE la vista compatta quando quella dettagliata è aperta */
-.palette-container.is-expanded .palette-swatches-compact {
-    display: none;
-}
-
-
-/* Stili per gli elementi nella vista dettagliata (già presenti, leggermente adattati) */
-.color-info { display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; border-radius: 4px; padding: 5px; transition: background-color 0.2s; }
+.color-info { display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; border-radius: 6px; padding: 8px; transition: background-color 0.2s; }
 .color-info:hover { background-color: #e9ecef; }
-.color-info .swatch { width: 30px; height: 30px; border-radius: 4px; margin-right: 10px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
-.hex-code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 0.9rem; color: #333; }
-.copy-feedback { margin-left: auto; font-size: 0.8rem; color: #007bff; font-weight: bold; }
+.color-info .swatch { width: 25px; height: 25px; border-radius: 6px; margin-right: 12px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+.hex-code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: 0.9rem; color: var(--text-color); }
+.copy-feedback { margin-left: auto; font-size: 0.8rem; color: var(--accent-color); font-weight: bold; }
 
-.download-palette-btn { width: calc(100% - 10px); margin: 5px; padding: 8px; font-size: 0.8rem; background-color: #28a745; color: white; }
-.download-palette-btn:hover { background-color: #218838; }
+.download-palette-btn {
+    width: 100%;
+    margin: 5px 0 0 0;
+    padding: 10px;
+    font-size: 0.9rem;
+    background-color: var(--green-color);
+    color: white;
+}
+.download-palette-btn:hover { background-color: var(--green-hover); }
 
-/* Stili per eliminazione, note, lightbox (invariati) */
-.delete-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%; font-size: 18px; font-weight: bold; line-height: 28px; text-align: center; cursor: pointer; opacity: 0; transform: scale(0.8); transition: opacity 0.2s, transform 0.2s, background-color 0.2s; z-index: 20; padding: 0; }
-.delete-btn:hover { background-color: #ff4d4d; }
-.grid-item:hover .delete-btn { opacity: 1; transform: scale(1); }
+/* Note (Post-it) con nuovo font */
+.note-item { padding: 20px; background-color: var(--note-bg); }
+.note-item textarea {
+    font-family: 'Lora', serif; /* Nuovo font per le note */
+    font-size: 1.15rem;
+    color: #3f310fb6;
+    min-height: 100px;
+    padding-top: 30px;
+}
 
-.note-item { padding: 15px; background-color: #fffacd; transform: rotate(-1.5deg); transition: transform 0.2s ease-in-out; }
-.note-item:nth-child(even) { transform: rotate(1.5deg); }
-.note-item:hover { transform: rotate(0deg) scale(1.03); z-index: 10; }
-.note-item textarea { width: 100%; border: none; background-color: transparent; font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; color: #333; resize: none; min-height: 100px; padding-top: 25px; }
-.note-item textarea:focus { outline: none; }
+/* Pulsante Elimina e Lightbox Ridisegnati */
+.delete-btn {
+    top: 10px; right: 10px; width: 30px; height: 30px; line-height: 30px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    color: var(--text-color);
+}
+.delete-btn:hover { background-color: var(--delete-bg); color: white; }
 
-#lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; cursor: zoom-out; z-index: 1000; padding: 20px; box-sizing: border-box; }
-#lightbox-overlay.hidden { display: none; }
-#lightbox-img { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 0 30px rgba(0,0,0,0.5); border-radius: 4px; }
+#lightbox-overlay { background-color: rgba(17, 24, 39, 0.9); backdrop-filter: blur(4px); }
+#lightbox-img { border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
 
-/* Responsive */
+/* Responsive (leggermente adattato) */
 @media (max-width: 1200px) { .grid-item { width: 31%; } }
-@media (max-width: 768px) { .grid-item { width: 48%; } }
-@media (max-width: 480px) { .grid-item { width: 98%; } h1 { font-size: 2rem; } button { width: calc(100% - 10px); } }
+@media (max-width: 768px) { .grid-item { width: 48%; } .button-container { flex-direction: column; } }
+@media (max-width: 480px) { .grid-item { width: 98%; } h1 { font-size: 2.2rem; } }
+
+/* Duplicati stili base per evitare conflitti */
+.note-item, .delete-btn, #lightbox-overlay, #lightbox-img, .note-item textarea, .note-item:hover, .grid-item:hover .delete-btn { /* Duplicati per garantire l'applicazione degli stili aggiornati */ }
+.note-item { transition: transform 0.2s ease-in-out; }
+.delete-btn { position: absolute; border: none; border-radius: 50%; font-size: 18px; font-weight: bold; text-align: center; cursor: pointer; opacity: 0; transform: scale(0.8); transition: all 0.2s; z-index: 20; padding: 0; }
+#lightbox-overlay.hidden { display: none; }
+.note-item textarea:focus { outline: none; }
